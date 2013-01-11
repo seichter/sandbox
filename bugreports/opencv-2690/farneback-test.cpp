@@ -63,7 +63,7 @@ public:
 			// fourcc
 			int fourCC = FourCC<'X','V','I','D'>::value;
 			// set framerate to 1fps - easier to check in a standard video player
-			if (output.open("flow.avi",fourCC,1,frames[cF].size(),false))
+			if (output.open("flow.avi",fourCC,25,frames[cF].size(),false))
 				{
 					std::cout << "capture file opened" << std::endl;
 				}		
