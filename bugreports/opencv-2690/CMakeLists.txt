@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(farnebeck)
+project(farneback)
 
 find_package(OpenCV REQUIRED)
 

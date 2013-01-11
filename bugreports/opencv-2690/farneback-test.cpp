@@ -44,6 +44,7 @@ public:
 
 	DenseOpticalFlow(double scale_ = 4)
 		: scale(scale_)
+		, currentFrame(false)
 	{
 	}
 
@@ -57,6 +58,9 @@ public:
 
 		// resize the image
 		cv::resize(image,frames[cF],cv::Size(image.cols*scale,image.rows*scale),0,0,cv::INTER_LINEAR);
+
+		std::cout << "Current: " << cF << " Previous: " << pF << std::endl;
+		std::cout << "Image " << image.size() << " c:" << image.channels() << " > " << frames[cF].size() << std::endl;
 
 		if (record && !output.isOpened())
 		{
@@ -123,8 +127,11 @@ int main(int argc,char* argv[])
 	
 	cv::Mat frame,gray;
 	
-	DenseOpticalFlow dof(cmd.get<double>("s"));
+	// please comment in and out -- this is causing the problem
+	int someRandomNumber(0);
 	
+	DenseOpticalFlow dof(cmd.get<double>("s"));
+
 	do {
 		
 		if (capture->read(frame))
