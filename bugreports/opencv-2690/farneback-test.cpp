@@ -22,6 +22,12 @@ void drawOptFlowMap(const cv::Mat& flow, cv::Mat& cflowmap, int step, const cv::
 		}
 }
 
+template <int a, int b, int c, int d>
+struct FourCC
+{
+    static const unsigned int value = (((((d << 8) | c) << 8) | b) << 8) | a;
+};
+
 class DenseOpticalFlow
 {
 	cv::Mat frames[2];
@@ -30,6 +36,9 @@ class DenseOpticalFlow
 	cv::Mat flow;
 
 	double scale;
+	
+	
+	cv::VideoWriter output;
 
 public:
 
@@ -38,7 +47,7 @@ public:
 	{
 	}
 
-	void operator()(const cv::Mat& image)
+	void operator()(const cv::Mat& image,bool record)
 	{
 		// no image no fun
 		if (image.empty()) return;
@@ -48,6 +57,17 @@ public:
 
 		// resize the image
 		cv::resize(image,frames[cF],cv::Size(image.cols*scale,image.rows*scale),0,0,cv::INTER_LINEAR);
+
+		if (record && !output.isOpened())
+		{
+			// fourcc
+			int fourCC = FourCC<'X','V','I','D'>::value;
+			// set framerate to 1fps - easier to check in a standard video player
+			if (output.open("flow.avi",fourCC,1,frames[cF].size(),false))
+				{
+					std::cout << "capture file opened" << std::endl;
+				}		
+		}
 
 		// make a copy for the initial frame
 		if (frames[pF].empty())
@@ -59,6 +79,7 @@ public:
 		// calculate dense optical flow
 		cv::calcOpticalFlowFarneback(frames[pF],frames[cF],flow,.5,2,8,3,7,1.5,0);
 
+		// we can't draw into the frame!
 		cv::Mat outImg = frames[cF].clone();
 
 		drawOptFlowMap(flow,outImg,8,cv::Scalar::all(255));
@@ -67,6 +88,11 @@ public:
 
 		// flip the buffers
 		currentFrame = !currentFrame;
+		
+		// record the frame
+		if (record && output.isOpened())
+			output.write(outImg);
+		
 	}
 };
 
@@ -74,11 +100,13 @@ int main(int argc,char* argv[])
 {
 	const char* keys =
 		"{ s   | scale  | 1      | scale of video input }"
+		"{ r   | record | false  | record frames }"
 		"{ v   | video  | 0      | video input }";
 	
 	cv::CommandLineParser cmd(argc,argv,keys);
 	
 	std::string videoName = cmd.get<std::string>("v");
+	bool recordVideo = cmd.get<bool>("r");
 	
 	cv::Ptr<cv::VideoCapture> capture = new cv::VideoCapture();
 
@@ -98,10 +126,11 @@ int main(int argc,char* argv[])
 	DenseOpticalFlow dof(cmd.get<double>("s"));
 	
 	do {
+		
 		if (capture->read(frame))
 		{
 			cv::cvtColor(frame,gray,cv::COLOR_BGR2GRAY);		
-			dof(gray);			
+			dof(gray,recordVideo);			
 		} else {
 			done = true;
 		}

@@ -1,4 +1,7 @@
-sandbox
-=======
+Die Sandkiste
+=============
 
-Bits and Bobs
+aka Bits and Bobs
+
+
+* OpenCV bugreport #2690 code and testset 
