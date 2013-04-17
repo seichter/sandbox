@@ -1,0 +1,44 @@
+<html>
+<head>
+	<script language="javascript">
+
+        function sendImage() {
+
+            var anImage = new Image();
+            var aDiv = document.getElementById('logo');
+
+
+            anImage.onload = function () {
+                console.log("Complete: " + anImage.complete);
+                console.log(anImage);
+
+                aDiv.appendChild(anImage);
+                
+                // neither pixmap or image sharing works in Release mode
+                engine.setPixmap(anImage);
+
+                // same here
+                //engine.setImage(anImage);
+            }
+
+            anImage.src = 'qt-logo-small.png';
+            
+        }
+
+
+        window.onload = function(e) {
+            console.log("Here we go");
+            console.log(engine);
+
+            sendImage();
+        }
+    </script>
+	<title>Qt5 Test</title>
+</head>
+<body>
+    <h1>Head</h1>
+    <p>Some Logo:</p>
+    <div id="logo">
+    </div>
+</body>
+</html>
