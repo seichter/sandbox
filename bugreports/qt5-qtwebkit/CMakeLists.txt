@@ -15,7 +15,10 @@ add_definitions(${Qt5Widgets_DEFINITIONS})
 set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 
 set(other_libs)
-list(APPEND other_libs Qt5::WinMain)
+
+if(WIN32)
+	list(APPEND other_libs Qt5::WinMain)
+endif()
 
 add_executable(qwebkitimage MACOSX_BUNDLE WIN32
 	main.cpp
